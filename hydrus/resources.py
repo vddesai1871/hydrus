@@ -138,7 +138,8 @@ class Item(Resource):
                     try:
                         # Update the right ID if the object is valid and matches
                         # type of Item
-                        socketio.emit('update', object_, namespace="/test")
+                        new_obj = {"obj": object_, "id": id_}
+                        socketio.emit('update', new_obj, namespace="/test")
                         object_id = crud.update(
                             object_=object_,
                             id_=id_,
