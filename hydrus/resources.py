@@ -50,6 +50,7 @@ from hydrus.helpers import (
     type_match,
     hydrafy)
 from hydrus.utils import get_session, get_doc, get_api_name, get_hydrus_server_url
+from hydrus.socketio_factory import socketio
 
 
 class Index(Resource):
@@ -137,6 +138,7 @@ class Item(Resource):
                     try:
                         # Update the right ID if the object is valid and matches
                         # type of Item
+                        socketio.emit('update', object_, namespace="/test")
                         object_id = crud.update(
                             object_=object_,
                             id_=id_,
