@@ -163,6 +163,20 @@ class HydraClass():
         return class_
 
 
+class HydraIriTemplate():
+    """Class for hydra IriTemplates"""
+
+    def __init__(self,
+                 template: str,
+                 basic_representation: bool):
+        self.template = template
+        if basic_representation:
+            self.variable_rep = "hydra:BasicRepresentation"
+        else:
+            self.variable_rep = "hydra:ExplicitRepresentation"
+        self.mapping = list()
+
+
 class HydraClassProp():
     """Template for a new property."""
 
