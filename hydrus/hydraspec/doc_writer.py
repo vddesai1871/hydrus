@@ -163,6 +163,28 @@ class HydraClass():
         return class_
 
 
+class IriTemplateMapping():
+    """Class for hydra IriTemplateMapping"""
+
+    def __init__(self,
+                 variable: str,
+                 prop: str,
+                 required: bool = True):
+        self.variable = variable
+        self.prop = prop
+        self.required = required
+
+    def generate(self) -> Dict[str, Any]:
+        """Get IriTemplateMapping as a python dict"""
+        iri_template_mapping = {
+            "@type": "IriTemplateMapping",
+            "variable": self.variable,
+            "property": self.prop,
+            "required": self.required
+        }
+        return iri_template_mapping
+
+
 class HydraIriTemplate():
     """Class for hydra IriTemplates"""
 
@@ -176,6 +198,26 @@ class HydraIriTemplate():
             self.variable_rep = "hydra:ExplicitRepresentation"
         self.mapping = list()
 
+    def add_mapping(self, iri_mapping: IriTemplateMapping) -> None:
+        """Add an iri template mapping.
+
+        Raises:
+            TypeError: If `iri_mapping` is not an instance of `IriTemplateMapping`
+
+        """
+        if not isinstance(iri_mapping, IriTemplateMapping):
+            raise TypeError("Type is not <IriTemplateMapping>")
+        self.mapping.append(iri_mapping)
+
+    def generate(self) -> Dict[str, Any]:
+        """Get IriTemplate as a python dict"""
+        iri_template = {
+            "@type": "IriTemplate",
+            "template": self.template,
+            "variableRepresentation": self.variable_rep,
+            "mapping": [x.generate() for x in self.mapping]
+        }
+        return iri_template
 
 class HydraClassProp():
     """Template for a new property."""
