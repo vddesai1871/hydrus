@@ -11,6 +11,7 @@ from hydrus.data.user import add_user
 from gevent.pywsgi import WSGIServer
 from hydrus.parser.openapi_parser import parse
 from hydrus.samples.hydra_doc_sample import doc as api_document
+from hydrus.socketio_factory import create_socket
 from importlib.machinery import SourceFileLoader
 from typing import Tuple
 import json
@@ -147,6 +148,7 @@ def startserver(adduser: Tuple, api: str, auth: bool, dburl: str,
     # Create a Hydrus app with the API name you want, default will be "api"
     app = app_factory(API_NAME)
     # Set the name of the API
+    socketio = create_socket(app)
     click.echo("Starting the application")
     with set_authentication(app, auth):
         # Use authentication for all requests
@@ -159,16 +161,17 @@ def startserver(adduser: Tuple, api: str, auth: bool, dburl: str,
                         # Set the Database session
                         with set_session(app, session):
                             # Start the Hydrus app
-                            http_server = WSGIServer(('', port), app)
-                            click.echo("Server running at:")
-                            click.echo(
-                                "{}{}".format(
-                                    HYDRUS_SERVER_URL,
-                                    API_NAME))
-                            try:
-                                http_server.serve_forever()
-                            except KeyboardInterrupt:
-                                pass
+                            socketio.run(app, port=port, debug=True, log_output=True)
+                            # http_server = WSGIServer(('', port), app)
+                            # click.echo("Server running at:")
+                            # click.echo(
+                            #     "{}{}".format(
+                            #         HYDRUS_SERVER_URL,
+                            #         API_NAME))
+                            # try:
+                            #     http_server.serve_forever()
+                            # except KeyboardInterrupt:
+                            #     pass
 
 
 if __name__ == "__main__":
