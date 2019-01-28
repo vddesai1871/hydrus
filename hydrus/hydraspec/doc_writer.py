@@ -21,7 +21,8 @@ class HydraDoc():
 
     def add_supported_class(
             self, class_: 'HydraClass', collection: Union[bool, 'HydraCollection']=False,
-            collection_path: str=None, collectionGet: bool=True, collectionPost: bool=True) -> None:
+            collection_path: str=None, collectionGet: bool=True, collectionPost: bool=True,
+            search_template: 'HydraIriTemplate' = None) -> None:
         """Add a new supportedClass.
 
         Raises:
@@ -38,7 +39,7 @@ class HydraDoc():
         }
         if collection:
             collection = HydraCollection(
-                class_, collection_path, collectionGet, collectionPost)
+                class_, collection_path, collectionGet, collectionPost, search_template)
             self.collections[collection.path] = {
                 "context": Context(address="{}{}".format(self.base_url, self.API),
                                    collection=collection), "collection": collection}
@@ -299,7 +300,7 @@ class HydraCollection():
 
     def __init__(
             self, class_: HydraClass,
-            collection_path: str=None, get: bool=True, post: bool=True) -> None:
+            collection_path: str=None, get: bool=True, post: bool=True, search_template: 'HydraIriTemplate' = None) -> None:
         """Generate Collection for a given class."""
         self.class_ = class_
         self.name = "{}Collection".format(class_.title)
@@ -309,7 +310,7 @@ class HydraCollection():
                                                  "members",
                                                  False, False, False,
                                                  "The {}".format(self.class_.title.lower()))]
-
+        self.search = search_template
         if get:
             get_op = HydraCollectionOp("_:{}_collection_retrieve".format(self.class_.title.lower()),
                                        "http://schema.org/FindAction",
@@ -341,6 +342,8 @@ class HydraCollection():
             "supportedOperation": [x.generate() for x in self.supportedOperation],
             "supportedProperty": [x.generate() for x in self.supportedProperty]
         }
+        if self.search:
+            collection["search"] = self.search.generate()
         return collection
 
 
