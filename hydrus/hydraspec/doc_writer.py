@@ -300,7 +300,7 @@ class HydraCollection():
 
     def __init__(
             self, class_: HydraClass,
-            collection_path: str=None, get: bool=True, post: bool=True, search_template: 'HydraIriTemplate' = None) -> None:
+            collection_path: str=None, get: bool=True, post: bool=True) -> None:
         """Generate Collection for a given class."""
         self.class_ = class_
         self.name = "{}Collection".format(class_.title)
@@ -310,7 +310,7 @@ class HydraCollection():
                                                  "members",
                                                  False, False, False,
                                                  "The {}".format(self.class_.title.lower()))]
-        self.search = search_template
+        self.search_template = None
         if get:
             get_op = HydraCollectionOp("_:{}_collection_retrieve".format(self.class_.title.lower()),
                                        "http://schema.org/FindAction",
@@ -331,6 +331,9 @@ class HydraCollection():
                                         )
             self.supportedOperation.append(post_op)
 
+    def add_search_template(self, search: HydraIriTemplate):
+        self.search_template = search
+
     def generate(self) -> Dict[str, Any]:
         """Get as a python dict."""
         collection = {
@@ -342,8 +345,8 @@ class HydraCollection():
             "supportedOperation": [x.generate() for x in self.supportedOperation],
             "supportedProperty": [x.generate() for x in self.supportedProperty]
         }
-        if self.search:
-            collection["search"] = self.search.generate()
+        if self.search_template:
+            collection["search"] = self.search_template.generate()
         return collection
 
 
